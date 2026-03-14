@@ -304,6 +304,44 @@ def _get_category_hint(word: str) -> str:
     return "Бұл күнделікті өмірде жиі кездесетін сөз."
 
 
+@app.get("/api/similar/{game_id}", tags=["game"])
+async def get_similar_words(game_id: int):
+    """Returns top 60 most similar words to the secret word. Only useful after winning."""
+    if not engine.is_loaded():
+        raise HTTPException(503, detail="Engine not ready.")
+    secret   = game_id_to_word(game_id)
+    if not engine.word_exists(secret):
+        raise HTTPException(500, detail="Secret word not in vocabulary.")
+    similar  = engine.get_top_similar(secret, topn=60)
+    return {
+        "secret": secret,
+        "similar": [
+            {"word": w, "rank": i + 2, "score": round(score, 4)}
+            for i, (w, score) in enumerate(similar)
+        ]
+    }
+
+
+@app.get("/api/similar/custom/{custom_token}", tags=["game"])
+async def get_custom_similar(custom_token: str):
+    """Returns top 60 similar words for a custom game."""
+    if not engine.is_loaded():
+        raise HTTPException(503, detail="Engine not ready.")
+    secret = custom_games.get(custom_token)
+    if not secret:
+        raise HTTPException(404, detail="Custom game not found.")
+    if not engine.word_exists(secret):
+        raise HTTPException(500, detail="Secret word not in vocabulary.")
+    similar = engine.get_top_similar(secret, topn=60)
+    return {
+        "secret": secret,
+        "similar": [
+            {"word": w, "rank": i + 2, "score": round(score, 4)}
+            for i, (w, score) in enumerate(similar)
+        ]
+    }
+
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.exception("Unhandled error: %s", exc)
