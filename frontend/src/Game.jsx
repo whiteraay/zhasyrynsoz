@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   fetchDailyGame, fetchRandomGame, createCustomGame,
-  submitGuess, fetchHint, APIError,
+  submitGuess, fetchHint, fetchSimilarWords, APIError,
 } from "./api";
 import { saveGameToHistory } from "./Stats";
 
@@ -73,6 +73,8 @@ export default function Game() {
   const [gameMode, setGameMode]           = useState("daily");
   const [guesses, setGuesses]             = useState([]);
   const [won, setWon]                     = useState(false);
+  const [similarWords, setSimilarWords]   = useState([]);
+  const [loadingSimilar, setLoadingSimilar] = useState(false);
   const [input, setInput]                 = useState("");
   const [loading, setLoading]             = useState(false);
   const [error, setError]                 = useState("");
@@ -155,6 +157,12 @@ export default function Game() {
           secretWord:  result.guess,
           ts:          Date.now(),
         });
+        // Load top-60 similar words
+        setLoadingSimilar(true);
+        fetchSimilarWords(gameId, customToken).then((data) => {
+          setSimilarWords(data.similar || []);
+          setLoadingSimilar(false);
+        }).catch(() => setLoadingSimilar(false));
       }
     } catch (err) {
       if (err instanceof APIError && err.code === "WORD_NOT_FOUND") {
@@ -173,12 +181,14 @@ export default function Game() {
     const d = await fetchDailyGame();
     setGameId(d.game_id); setCustomToken(null); setGameMode("daily");
     setGuesses([]); setWon(false); setHintStates({}); setShowCustomForm(false);
+    setSimilarWords([]); setLoadingSimilar(false);
   };
 
   const switchToRandom = async () => {
     const d = await fetchRandomGame();
     setGameId(d.game_id); setCustomToken(null); setGameMode("random");
     setGuesses([]); setWon(false); setHintStates({}); setShowCustomForm(false);
+    setSimilarWords([]); setLoadingSimilar(false);
   };
 
   const handleCreateCustom = async () => {
@@ -402,6 +412,35 @@ export default function Game() {
           <button className="btn-new-game" onClick={gameMode === "random" ? switchToRandom : switchToDaily}>
             Жаңа ойын
           </button>
+        </div>
+      )}
+
+      {/* Top-60 similar words after winning */}
+      {won && (
+        <div className="similar-section">
+          <div className="similar-header">
+            <span className="similar-title">Жасырын сөзге жақын топ-60</span>
+            {loadingSimilar && <span className="similar-loading">жүктелуде…</span>}
+          </div>
+          {similarWords.length > 0 && (
+            <div className="similar-list">
+              {similarWords.map((item) => {
+                const color = item.rank <= 10 ? "sim-gold"
+                            : item.rank <= 25 ? "sim-green"
+                            : item.rank <= 45 ? "sim-yellow"
+                            : "sim-gray";
+                // check if player guessed this word
+                const wasGuessed = guesses.find((g) => g.guess === item.word);
+                return (
+                  <div key={item.word} className={`similar-item ${color} ${wasGuessed ? "sim-guessed" : ""}`}>
+                    <span className="sim-rank">#{item.rank}</span>
+                    <span className="sim-word">{item.word}</span>
+                    {wasGuessed && <span className="sim-tag">✓ болжадыңыз</span>}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 

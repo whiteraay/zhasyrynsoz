@@ -56,3 +56,13 @@ export async function fetchHint(gameId, hintType = "category", customToken = nul
   }
   return apiFetch(`/api/hint/${gameId}?hint_type=${hintType}&offset=${offset}`);
 }
+
+/**
+ * Fetch top 60 similar words after winning.
+ */
+export async function fetchSimilarWords(gameId, customToken = null) {
+  if (customToken) {
+    return apiFetch(`/api/similar/custom/${customToken}`);
+  }
+  return apiFetch(`/api/similar/${gameId}`);
+}

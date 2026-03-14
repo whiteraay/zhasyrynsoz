@@ -391,3 +391,92 @@ body {
   .theme-grid     { grid-template-columns: 1fr 1fr; }
   .share-buttons  { grid-template-columns: 1fr 1fr; }
 }
+
+/* ── Similar words section ───────────────────── */
+.similar-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  animation: fadeDown 0.3s ease;
+}
+
+.similar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.similar-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.similar-loading {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.similar-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.similar-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  position: relative;
+}
+
+/* Color tiers */
+.sim-gold   { background: rgba(234,179,8,0.12);  border-color: rgba(234,179,8,0.3); }
+.sim-green  { background: rgba(34,197,94,0.08);  border-color: rgba(34,197,94,0.2); }
+.sim-yellow { background: rgba(251,146,60,0.08); border-color: rgba(251,146,60,0.2); }
+.sim-gray   { background: var(--bg3);            border-color: var(--border); }
+
+/* Player guessed it */
+.sim-guessed { outline: 2px solid rgba(255,255,255,0.4); outline-offset: 1px; }
+
+.sim-rank {
+  font-family: 'Inter', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-dim);
+  min-width: 24px;
+  flex-shrink: 0;
+}
+
+.sim-gold   .sim-rank { color: #eab308; }
+.sim-green  .sim-rank { color: #22c55e; }
+.sim-yellow .sim-rank { color: #fb923c; }
+
+.sim-word {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sim-tag {
+  position: absolute;
+  right: 6px;
+  font-size: 9px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .similar-list { grid-template-columns: repeat(2, 1fr); }
+}
