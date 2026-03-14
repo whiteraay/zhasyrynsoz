@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+
+  # ── Backend (FastAPI) ─────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kazakhsho-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - VECTORS_PATH=/app/data/wiki.kk.vec
+      - CACHE_PATH=/app/data/kk_vectors.npz
+      - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:80,https://yourdomain.com
+    volumes:
+      # Mount the data folder so vector files persist between rebuilds
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s   # Give time to load vectors
+
+  # ── Frontend (Vite → Nginx) ───────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:8000
+    container_name: kazakhsho-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  data:
