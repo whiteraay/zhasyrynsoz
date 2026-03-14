@@ -424,21 +424,52 @@ export default function Game() {
           </div>
           {similarWords.length > 0 && (
             <div className="similar-list">
-              {similarWords.map((item) => {
-                const color = item.rank <= 10 ? "sim-gold"
-                            : item.rank <= 25 ? "sim-green"
-                            : item.rank <= 45 ? "sim-yellow"
-                            : "sim-gray";
-                // check if player guessed this word
-                const wasGuessed = guesses.find((g) => g.guess === item.word);
-                return (
-                  <div key={item.word} className={`similar-item ${color} ${wasGuessed ? "sim-guessed" : ""}`}>
-                    <span className="sim-rank">#{item.rank}</span>
-                    <span className="sim-word">{item.word}</span>
-                    {wasGuessed && <span className="sim-tag">✓ болжадыңыз</span>}
-                  </div>
-                );
-              })}
+              {similarWords
+                .filter((item) => {
+                  const w = item.word;
+                  // Filter out obvious inflected forms:
+                  // words ending in common Kazakh suffixes where a shorter root exists
+                  const inflectionEndings = [
+                    "лардың","лердің","дардың","дердің","тардың","тердің",
+                    "ларды","лерді","дарды","дерді","тарды","терді",
+                    "ларда","лерде","дарда","дерде","тарда","терде",
+                    "лардан","лерден","дардан","дерден","тардан","терден",
+                    "ларға","лерге","дарға","дерге","тарға","терге",
+                    "лармен","лермен","дармен","дермен","тармен","термен",
+                    "лары","лері","лар","лер","дар","дер","тар","тер",
+                    "ның","нің","дың","дің","тың","тің",
+                    "ды","ді","ты","ті","ны","ні",
+                    "да","де","та","те","нда","нде",
+                    "дан","ден","тан","тен","нан","нен",
+                    "ға","ге","қа","ке","на","не",
+                    "мен","бен","пен",
+                    "сы","сі","ым","ім","ың","іңіз","ыңыз",
+                  ].sort((a,b) => b.length - a.length);
+                  for (const end of inflectionEndings) {
+                    if (w.endsWith(end) && w.length - end.length >= 2) {
+                      return false; // likely inflected
+                    }
+                  }
+                  // Must be at least 2 chars, no digits, no Latin
+                  if (w.length < 2) return false;
+                  if (/[a-zA-Z0-9]/.test(w)) return false;
+                  return true;
+                })
+                .slice(0, 60)
+                .map((item, displayIdx) => {
+                  const color = displayIdx < 8  ? "sim-gold"
+                              : displayIdx < 20 ? "sim-green"
+                              : displayIdx < 40 ? "sim-yellow"
+                              : "sim-gray";
+                  const wasGuessed = guesses.find((g) => g.guess === item.word);
+                  return (
+                    <div key={item.word} className={`similar-item ${color} ${wasGuessed ? "sim-guessed" : ""}`}>
+                      <span className="sim-rank">#{displayIdx + 2}</span>
+                      <span className="sim-word">{item.word}</span>
+                      {wasGuessed && <span className="sim-tag">✓</span>}
+                    </div>
+                  );
+                })}
             </div>
           )}
         </div>

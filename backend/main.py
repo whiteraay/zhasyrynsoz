@@ -312,7 +312,7 @@ async def get_similar_words(game_id: int):
     secret   = game_id_to_word(game_id)
     if not engine.word_exists(secret):
         raise HTTPException(500, detail="Secret word not in vocabulary.")
-    similar  = engine.get_top_similar(secret, topn=60)
+    similar  = engine.get_top_similar(secret, topn=200)
     return {
         "secret": secret,
         "similar": [
@@ -332,7 +332,7 @@ async def get_custom_similar(custom_token: str):
         raise HTTPException(404, detail="Custom game not found.")
     if not engine.word_exists(secret):
         raise HTTPException(500, detail="Secret word not in vocabulary.")
-    similar = engine.get_top_similar(secret, topn=60)
+    similar = engine.get_top_similar(secret, topn=200)
     return {
         "secret": secret,
         "similar": [
