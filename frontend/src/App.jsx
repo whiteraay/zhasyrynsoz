@@ -1,11 +1,13 @@
 import { useState } from "react";
 import Game from "./Game";
 import Stats from "./Stats";
+import { ThemeProvider, ThemePicker } from "./Theme";
 import "./index.css";
 
-export default function App() {
+function AppInner() {
   const [showRules, setShowRules] = useState(false);
   const [showStats, setShowStats] = useState(false);
+  const [showTheme, setShowTheme] = useState(false);
 
   return (
     <div className="app">
@@ -15,15 +17,9 @@ export default function App() {
           <div className="app-infinity">∞</div>
         </div>
         <div className="header-btns">
-          <button className="btn-icon" onClick={() => setShowStats(true)} title="Статистика">
-            📊
-          </button>
-          <button
-            className="btn-rules"
-            onClick={() => setShowRules((v) => !v)}
-          >
-            {showRules ? "✕" : "?"}
-          </button>
+          <button className="btn-icon" onClick={() => setShowStats(true)}  title="Статистика">📊</button>
+          <button className="btn-icon" onClick={() => setShowTheme(true)}  title="Тақырып">🎨</button>
+          <button className="btn-rules" onClick={() => setShowRules((v) => !v)}>{showRules ? "✕" : "?"}</button>
         </div>
       </header>
 
@@ -49,6 +45,15 @@ export default function App() {
       </footer>
 
       {showStats && <Stats onClose={() => setShowStats(false)} />}
+      {showTheme && <ThemePicker onClose={() => setShowTheme(false)} />}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppInner />
+    </ThemeProvider>
   );
 }
