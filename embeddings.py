@@ -24,7 +24,7 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 FASTTEXT_URL = "https://dl.fbaipublicfiles.com/fasttext/vectors-wiki/wiki.kk.vec"
-VECTORS_PATH = Path(os.getenv("VECTORS_PATH", "./data/wiki.kk.vec"))
+VECTORS_PATH = Path(os.getenv("VECTORS_PATH", "./data/wiki.kk.clean.vec"))
 CACHE_PATH = Path(os.getenv("CACHE_PATH", "./data/kk_vectors.npz"))
 
 
