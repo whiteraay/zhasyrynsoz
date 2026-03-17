@@ -35,6 +35,14 @@ class EmbeddingEngine:
         if self._loaded:
             return
 
+        # DELETE old cache — it may contain 163k words instead of DAILY_WORDS
+        if CACHE_PATH.exists():
+            try:
+                CACHE_PATH.unlink()
+                logger.info(f"Deleted old cache: {CACHE_PATH}")
+            except Exception as e:
+                logger.warning(f"Could not delete cache: {e}")
+
         # Load DAILY_WORDS list
         from words import DAILY_WORDS
         daily_set = set(w.strip().lower() for w in DAILY_WORDS)
