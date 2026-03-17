@@ -227,7 +227,10 @@ def _build_hint(secret: str, hint_type: str, offset: int = 0) -> str:
     if not engine.word_exists(secret):
         raise HTTPException(500, detail="Secret word not in vocabulary.")
 
-    neighbors = engine.get_top_similar(secret, topn=700)
+    from words import DAILY_WORDS as _dw
+    _daily_set = set(w.lower() for w in _dw)
+    _all = engine.get_top_similar(secret, topn=len(engine.words))
+    neighbors = [(w, s) for w, s in _all if w.lower() in _daily_set][:700]
 
     if hint_type == "far_word":
         word = _neighbor_word(neighbors, 199, 300)
