@@ -167,6 +167,10 @@ async def submit_guess(body: GuessRequest):
     if not engine.word_exists(guess):
         raise HTTPException(422, detail={"code": "WORD_NOT_FOUND", "message": f"Сөз табылмады: «{guess}»."})
 
+    # Тек DAILY_WORDS ішіндегі сөздер арасындағы rank
+    _daily_set = set(w.lower() for w in DAILY_WORDS)
+    if guess.lower() not in _daily_set and guess.lower() != secret.lower():
+        raise HTTPException(status_code=404, detail="Сөз тізімде жоқ")
     rank = engine.get_rank(secret, guess)
     if rank is None:
         raise HTTPException(500, detail="Could not compute rank.")
@@ -174,7 +178,7 @@ async def submit_guess(body: GuessRequest):
     return GuessResponse(
         rank=rank,
         color=rank_to_color(rank),
-        closeness_pct=rank_to_closeness_pct(rank, len(engine.words)),
+        closeness_pct=rank_to_closeness_pct(rank, len(DAILY_WORDS)),
         found=False,
         guess=guess,
     )
