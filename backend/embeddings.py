@@ -54,7 +54,7 @@ class EmbeddingEngine:
             return
 
         # Try fast numpy cache first
-        if CACHE_PATH.exists():
+        if False:  # cache disabled - always reload fresh
             logger.info(f"Loading cached vectors from {CACHE_PATH}")
             self._load_from_cache()
             return
