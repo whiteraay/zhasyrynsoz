@@ -93,12 +93,21 @@ class EmbeddingEngine:
                 except ValueError:
                     continue
 
-        self.words = words
-        self.vectors = np.array(vectors, dtype=np.float32)
+        # Тек DAILY_WORDS-та бар сөздерді ғана жүкте
+        from words import DAILY_WORDS
+        daily_set = set(w.lower() for w in DAILY_WORDS)
+        filtered_words = []
+        filtered_vectors = []
+        for w, v in zip(words, vectors):
+            if w.lower() in daily_set:
+                filtered_words.append(w.lower())
+                filtered_vectors.append(v)
+        self.words = filtered_words
+        self.vectors = np.array(filtered_vectors, dtype=np.float32)
         self._normalize()
         self._build_index()
         self._loaded = True
-        logger.info(f"Loaded {len(self.words)} word vectors.")
+        logger.info(f"Loaded {len(self.words)} word vectors (filtered to DAILY_WORDS).")
 
     def _load_from_cache(self):
         """Load from compressed numpy cache (much faster than parsing .vec)."""
