@@ -1,5 +1,5 @@
 ---
-title: Zhasyrynsoz API
+title: Zhasyrynsoz 
 emoji: 🎮
 colorFrom: blue
 colorTo: green
@@ -9,4 +9,6 @@ pinned: false
 
 # Контексто — Қазақша
 
-Kazakh word guessing game API. FastAPI backend with FastText embeddings.
+Kazakh word guessing game. FastAPI backend with FastText embeddings.
+Guess the hidden word by trials u have.
+Share ur results in social net!
